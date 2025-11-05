@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ways to Stay Healthy Around Animals — Knowledge Check</title>
+
+<style>
+:root {
+  --navy: #003057;
+  --gold: #ffb300;
+  --bg: #f6f8fb;
+  --radius: 12px;
+  --shadow: 0 6px 18px rgba(0,48,87,0.1);
+}
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: var(--bg);
+  color: #102033;
+  margin: 0;
+  padding: 40px 16px;
+  display: flex;
+  justify-content: center;
+}
+.container {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  width: 100%;
+  padding: 30px 24px;
+}
+h1 {
+  color: var(--navy);
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+}
+.progress {
+  height: 8px;
+  background: rgba(0,48,87,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--gold);
+  transition: width 0.3s ease;
+}
+.question {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.options {
+  display: grid;
+  gap: 10px;
+}
+button.option {
+  background: #fff;
+  border: 2px solid rgba(0,48,87,0.15);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+button.option:hover {
+  border-color: var(--gold);
+  background: rgba(255,179,0,0.08);
+}
+button.option.correct {
+  background: rgba(0,160,80,0.12);
+  border-color: #0a8f55;
+  color: #0a8f55;
+}
+button.option.incorrect {
+  background: rgba(200,0,0,0.1);
+  border-color: #c00000;
+  color: #c00000;
+}
+.feedback {
+  margin-top: 10px;
+  font-size: 14px;
+}
+.feedback.correct {
+  color: #0a8f55;
+}
+.feedback.incorrect {
+  color: #c00000;
+}
+.next-btn, .restart-btn {
+  margin-top: 20px;
+  display: inline-block;
+  background: var(--navy);
+  color: #fff;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.next-btn:hover, .restart-btn:hover {
+  background: #004c7f;
+}
+.score {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+.explanation {
+  background: rgba(0,48,87,0.04);
+  padding: 8px 10px;
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Knowledge Check: Staying Healthy Around Animals</h1>
+  <div class="progress"><div class="progress-bar"></div></div>
+  <div id="quiz"></div>
+</div>
+
+<script>
+// Quiz data
+const quizData = [
+  {
+    question: "1. What is one major health benefit of owning a pet?",
+    options: [
+      "They guarantee you will never get sick.",
+      "They can help reduce blood pressure and stress levels.",
+      "They eliminate the need for exercise.",
+      "They replace regular medical checkups."
+    ],
+    answer: 1,
+    explanation: "Regular interaction with pets, such as walking or playing, can reduce blood pressure, cholesterol, and stress."
+  },
+  {
+    question: "2. Which group is at higher risk for diseases that spread from animals to people?",
+    options: [
+      "Teenagers",
+      "Adults aged 20–50",
+      "Children under 5, older adults, and people with weakened immune systems",
+      "All groups are equally at risk"
+    ],
+    answer: 2,
+    explanation: "Young children, older adults, pregnant people, and immunocompromised individuals are more susceptible to zoonotic diseases."
+  },
+  {
+    question: "3. When should you wash your hands around animals?",
+    options: [
+      "Only after touching animal food",
+      "Only after touching an animal directly",
+      "After handling animals, their food, cages, or cleaning up waste",
+      "Only before eating"
+    ],
+    answer: 2,
+    explanation: "Wash hands after any contact with animals or their environments to prevent the spread of germs."
+  },
+  {
+    question: "4. Where should you clean pet cages, tanks, or dishes?",
+    options: [
+      "In the kitchen sink for convenience",
+      "In bathroom sinks",
+      "Outside or in a dedicated cleaning area",
+      "Anywhere is fine as long as you use soap"
+    ],
+    answer: 2,
+    explanation: "Clean and disinfect pet supplies outside the house when possible to prevent kitchen contamination."
+  },
+  {
+    question: "5. What is the safest way to handle your pet’s feces?",
+    options: [
+      "Leave it to decompose naturally",
+      "Pick it up using a bag and dispose of it properly",
+      "Rinse it down the storm drain",
+      "Let children handle it carefully"
+    ],
+    answer: 1,
+    explanation: "Dog and cat feces can carry parasites; always bag and dispose of waste in proper areas."
+  }
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+const quiz = document.getElementById("quiz");
+const progressBar = document.querySelector(".progress-bar");
+
+function loadQuestion() {
+  progressBar.style.width = ((currentQuestion) / quizData.length) * 100 + "%";
+  const q = quizData[currentQuestion];
+  quiz.innerHTML = `
+    <div class="question">${q.question}</div>
+    <div class="options">
+      ${q.options.map((opt,i)=>`<button class="option" onclick="selectOption(${i})">${opt}</button>`).join("")}
+    </div>
+    <div id="feedback" class="feedback"></div>
+  `;
+}
+
+function selectOption(i){
+  const q = quizData[currentQuestion];
+  const buttons = document.querySelectorAll(".option");
+  buttons.forEach(b => b.disabled = true);
+
+  const feedback = document.getElementById("feedback");
+
+  if(i === q.answer){
+    buttons[i].classList.add("correct");
+    feedback.textContent = "✅ Correct!";
+    feedback.className = "feedback correct";
+    score++;
+  } else {
+    buttons[i].classList.add("incorrect");
+    buttons[q.answer].classList.add("correct");
+    feedback.textContent = "❌ Incorrect.";
+    feedback.className = "feedback incorrect";
+  }
+
+  // Add explanation
+  feedback.insertAdjacentHTML("beforeend", `<div class="explanation">${q.explanation}</div>`);
+
+  // Show Next button
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "next-btn";
+  nextBtn.textContent = currentQuestion === quizData.length-1 ? "See Results" : "Next Question";
+  nextBtn.onclick = nextQuestion;
+  quiz.appendChild(nextBtn);
+}
+
+function nextQuestion(){
+  currentQuestion++;
+  if(currentQuestion < quizData.length){
+    loadQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults(){
+  progressBar.style.width = "100%";
+  quiz.innerHTML = `
+    <div class="score">You scored ${score} out of ${quizData.length}!</div>
+    <p style="margin-top:8px;">${score >= 4 ? "Great job! You understand how to stay healthy around animals." : "Review the tips above to strengthen your knowledge."}</p>
+    <button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+  `;
+}
+
+function restartQuiz(){
+  currentQuestion = 0;
+  score = 0;
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
